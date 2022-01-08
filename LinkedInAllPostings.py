@@ -1,4 +1,3 @@
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
@@ -19,10 +18,10 @@ pd.set_option('display.max_colwidth', None)
 #create variable for the directory path that your chromedriver.exe is stored in
 PATH = "C://Program Files (x86)//chromedriver.exe"
 
-#set up driver variable to store your Chrome Webdriver activation code
+#set up driver variable to store your Chrome Webdriver activation
 driver = webdriver.Chrome(PATH)
 
-#set up url variable to access LinkedIn. Replace the job title (Chemical Engineer) and location (Arizona) in the url to configure the search according to your desired parameters. 
+#set up url variable to access LinkedIn search. Replace the job title (Chemical Engineer) and location (Arizona) in the url to configure the search according to your desired parameters. 
 
 url = 'https://www.linkedin.com/jobs/search?keywords=Chemical%20Engineer&location=Arizona&geoId=&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0'
 
@@ -107,6 +106,7 @@ for job in jobs:
     #use another for loop to first click on the job posting, then click the show more button to open the full job posting description. 
     #use len(jobs) to iterate through all job postings. The xpath for clicking the job postings and show more buttons will change and necessitates a few try and excepts
     #for item in range  is used to cycle through each posting by changing the li tag number to move from one posting to another
+    #
 for item in range(len(jobs)):
     try:
         job_click_path = f'/html/body/div[1]/div/main/section[2]/ul/li[{item + 1}]/div/a'
@@ -143,11 +143,14 @@ for item in range(len(jobs)):
     except:
         pass
 
+    #store xpath as jd_path variable. Use webdriver wait to find element and then append the inner text to jd Python list
     jd_path = '/html/body/div[1]/div/section/div[2]/div/section[1]/div'
     jd0 = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, (jd_path))))
     jd00 = jd0.get_attribute('innerText')
     jd.append(jd00)
-
+    
+    #store xpath as seniority_path variable. Use try/except to account for change in xpath. If element does not exist, return N/A. 
+    #append inner text to seniority Python list
     try:
         seniority_path = '/html/body/div[1]/div/section/div[2]/div[1]/section[1]/div/ul/li[1]/span'
         seniority0 = driver.find_element_by_xpath(seniority_path).get_attribute('innerText')
@@ -163,6 +166,8 @@ for item in range(len(jobs)):
 
     seniority.append(seniority0)
 
+    #store xpath as emp_type_path variable. Use try/except to account for change in xpath. If element does not exist, return N/A. 
+    #append inner text to emp_type Python list
     try:
         emp_type_path = '/html/body/div[1]/div/section/div[2]/div/section[1]/div/ul/li[2]/span'
         emp_type0 = driver.find_element_by_xpath(emp_type_path).get_attribute('innerText')
@@ -175,6 +180,8 @@ for item in range(len(jobs)):
 
     emp_type.append(emp_type0)
 
+    #store xpath as job_func_path variable. Use try/except to account for change in xpath. If element does not exist, return N/A. 
+    #append inner text to job_func Python list
     try:
         job_func_path = '/html/body/div[1]/div/section/div[2]/div/section[1]/div/ul/li[3]/span'
         job_func0 = driver.find_element_by_xpath(job_func_path).get_attribute('innerText')
@@ -187,6 +194,8 @@ for item in range(len(jobs)):
 
     job_func.append(job_func0)
 
+    #store xpath as industries_path variable. Use try/except to account for change in xpath. If element does not exist, return N/A. 
+    #append inner text to industries Python list
     try:
         industries_path = 'html/body/div[1]/div/section/div[2]/div[1]/section[1]/div/ul/li[4]/span'
         industries0 = driver.find_element_by_xpath(industries_path).get_attribute('innerText')
@@ -199,6 +208,7 @@ for item in range(len(jobs)):
 
     industries.append(industries0)
 
+#set up job_data variable to hold your dataframe. 
 job_data = pd.DataFrame({'Job Title': job_title,
                          'Company Name': company_name,
                          'Location': location,
@@ -211,6 +221,20 @@ job_data = pd.DataFrame({'Job Title': job_title,
                          'Industry': industries
                          })
 
+#clean up dataframe lists by replacing \n newline characters with a space
+job_data['Job Title'] = job_data['Job Title'].str.replace('\n', ' ')
+job_data['Comapany Name'] = job_data['Comapany Name'].str.replace('\n', ' ')
+job_data['Location'] = job_data['Location'].str.replace('\n', ' ')
+job_data['Date'] = job_data['Date'].str.replace('\n', ' ')
+job_data['Job Link'] = job_data['Job Link'].str.replace('\n', ' ')
 job_data['Job Description'] = job_data['Job Description'].str.replace('\n', ' ')
+job_data['Seniority'] = job_data['Seniority'].str.replace('\n', ' ')
+job_data['Employment Type'] = job_data['Employment Type'].str.replace('\n', ' ')
+job_data['Job Function'] = job_data['Job Function'].str.replace('\n', ' ')
+job_data['Industry'] = job_data['Industry'].str.replace('\n', ' ')
+
+# print dataframe to check for results
 print(job_data)
+
+#export dataframe in format of your choice
 job_data.to_csv('test_scrape.csv', index=False, encoding='utf-8')
