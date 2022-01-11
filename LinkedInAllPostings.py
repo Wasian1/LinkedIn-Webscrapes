@@ -52,16 +52,32 @@ industries = []
 
 #use loop below to scroll down to the bottom of the job postings page. Use a try and except to click the load more jobs button when it appears. 
 
-i = 2
-while i <= int(no_of_jobs/25)+1:
-    driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-    i = i + 1
+Scroll_Pause_Time = 0.5
+
+# Get scroll height
+last_height = driver.execute_script("return document.body.scrollHeight")
+
+while True:
+    # Scroll down to bottom
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+    # Wait to load page
+    time.sleep(Scroll_Pause_Time)
+
+    # Calculate new scroll height and compare with last scroll height
+    new_height = driver.execute_script("return document.body.scrollHeight")
+    if new_height == last_height:
+        break
+    last_height = new_height
     try:
         driver.find_element_by_xpath('/html/body/div[1]/div/main/section[2]/button').click()
         time.sleep(5)
     except:
         pass
         time.sleep(5)
+
+#scroll back to top of page
+driver.execute_script('window.scrollTo(0, 0);')
 
 #use find_element_by_class_name to create a webelement of the job search results
 
@@ -233,7 +249,7 @@ job_data['Employment Type'] = job_data['Employment Type'].str.replace('\n', ' ')
 job_data['Job Function'] = job_data['Job Function'].str.replace('\n', ' ')
 job_data['Industry'] = job_data['Industry'].str.replace('\n', ' ')
 
-# print dataframe to check for results
+# print dataframe to check results
 print(job_data)
 
 #export dataframe in format of your choice
