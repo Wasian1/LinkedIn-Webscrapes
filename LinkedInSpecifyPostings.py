@@ -24,8 +24,6 @@ driver.maximize_window()
 
 driver.get(url)
 
-no_of_jobs = int(driver.find_element_by_xpath('/html/body/div[1]/div/main/div/h1/span[1]').get_attribute('innerText'))
-
 job_title = []
 company_name = []
 location = []
@@ -70,7 +68,7 @@ job_lists = driver.find_element_by_class_name('jobs-search__results-list')
 jobs = job_lists.find_elements_by_tag_name('li')
 print(len(jobs))
 
-limit = 3
+limit = 1000
 for job in islice(jobs, limit):
     job_title0 = job.find_element_by_css_selector('h3').get_attribute('innerText')
     job_title.append(job_title0)
@@ -87,7 +85,7 @@ for job in islice(jobs, limit):
     job_link0 = job.find_element_by_css_selector('a').get_attribute('href')
     job_link.append(job_link0)
 
-for item in range(3):
+for item in range(1000):
     try:
         job_click_path = f'/html/body/div[1]/div/main/section[2]/ul/li[{item + 1}]/div/a'
         job_click = driver.find_element_by_xpath(job_click_path).click()
